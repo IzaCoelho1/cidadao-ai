@@ -1,0 +1,24 @@
+# Ambiente virtual
+.venv/
+
+# Variáveis de ambiente e chaves de API
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Banco vetorial local
+data/vectorstore/
+data/chroma/
+
+# Logs e temporários
+*.log
+*.tmp
+
+# VS Code
+.vscode/
+
+# Windows / macOS
+Thumbs.db
+.DS_Store

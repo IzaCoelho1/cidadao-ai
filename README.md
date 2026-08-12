@@ -20,7 +20,7 @@ O sistema permite responder perguntas como:
 - Onde posso solicitar um serviço?
 - Qual secretaria é responsável?
 
-A interface também disponibiliza **sugestões de perguntas em botões interativos**, facilitando a utilização do agente e permitindo que o cidadão conheça exemplos de consultas que podem ser realizadas.
+A interface também disponibiliza **sugestões de perguntas por meio de botões interativos**, facilitando a utilização do agente e apresentando exemplos de consultas que podem ser realizadas.
 
 Quando uma informação não está disponível na Carta de Serviços, o agente informa que não encontrou a resposta na base consultada, reduzindo a geração de informações sem fundamento.
 
@@ -30,16 +30,16 @@ Quando uma informação não está disponível na Carta de Serviços, o agente i
 
 O projeto utiliza a arquitetura **RAG (Retrieval-Augmented Generation)**.
 
-O funcionamento ocorre, de forma simplificada, nas seguintes etapas:
+O funcionamento ocorre nas seguintes etapas:
 
 1. Os dados da Carta de Serviços são carregados e processados.
 2. Cada serviço é transformado em um documento para consulta.
 3. Os documentos são convertidos em embeddings.
-4. Os embeddings são armazenados em um banco vetorial **ChromaDB**.
-5. A pergunta do cidadão é convertida em uma representação vetorial.
+4. Os embeddings são armazenados no banco vetorial **ChromaDB**.
+5. A pergunta do cidadão também é transformada em uma representação vetorial.
 6. O sistema realiza uma busca semântica para encontrar os serviços mais relacionados à pergunta.
 7. Os documentos recuperados são utilizados como contexto para o modelo de linguagem.
-8. O **Google Gemini** gera a resposta com base nas informações recuperadas.
+8. O **Google Gemini** gera a resposta utilizando as informações recuperadas.
 9. A resposta é apresentada ao cidadão por meio da interface desenvolvida em **Streamlit**.
 
 ---
@@ -109,6 +109,7 @@ cidadao-ai/
 │
 ├── docs/
 │   └── evidencias/
+│       ├── cidadao-ai-deploy-oci.png
 │       ├── cidadao-ai-oci.png
 │       └── cidadao-ai-resposta-fora-base.png
 │
@@ -118,6 +119,7 @@ cidadao-ai/
 │   ├── criar_documentos.py
 │   ├── criar_banco_vetorial.py
 │   ├── ler_pdf.py
+│   ├── preparar_dados.py
 │   ├── testar_busca.py
 │   ├── testar_embeddings.py
 │   ├── testar_gemini.py
@@ -127,7 +129,9 @@ cidadao-ai/
 ├── tests/
 │   └── test_busca.py
 │
+├── .dockerignore
 ├── .gitignore
+├── Dockerfile
 ├── README.md
 └── requirements.txt
 ```
@@ -161,9 +165,9 @@ Entre as informações disponíveis estão:
 
 O Cidadão.AI utiliza embeddings para representar semanticamente tanto os serviços da Carta de Serviços quanto as perguntas realizadas pelos cidadãos.
 
-Quando uma pergunta é enviada, o sistema busca no **ChromaDB** os documentos semanticamente mais próximos da consulta.
+Quando uma pergunta é enviada, o sistema realiza uma busca no **ChromaDB** para recuperar os documentos semanticamente mais relacionados à consulta.
 
-Os documentos recuperados são enviados ao modelo de linguagem como contexto, permitindo que a resposta seja produzida com base na documentação oficial utilizada pelo projeto.
+Os documentos recuperados são enviados ao modelo de linguagem como contexto, permitindo que a resposta seja produzida com base nas informações da documentação utilizada pelo projeto.
 
 ---
 
@@ -179,7 +183,7 @@ O agente pode receber perguntas em linguagem natural, como:
 
 > Quais documentos preciso para solicitar a poda de uma árvore?
 
-A interface também possui botões com sugestões de perguntas para facilitar a demonstração e o uso do sistema.
+A interface também possui botões com sugestões de perguntas para facilitar a demonstração e a utilização do sistema.
 
 ---
 
@@ -189,18 +193,39 @@ A interface também possui botões com sugestões de perguntas para facilitar a 
 
 > Como faço para solicitar retirada de entulho?
 
-### Exemplo de resposta
+### Resposta
 
-O agente identifica na Carta de Serviços o serviço relacionado à retirada de entulho e apresenta informações como:
+O Cidadão.AI recupera as informações relacionadas ao serviço e orienta o cidadão sobre os documentos, etapas, prazo, custo, canais de atendimento e unidade responsável.
 
-- documentos necessários;
-- etapas para solicitação;
-- prazo;
-- custo;
-- canais de atendimento;
-- unidade responsável.
+Entre as informações recuperadas estão:
 
-Entre as orientações recuperadas, o cidadão é informado de que deve realizar a solicitação pelos canais disponibilizados pela Prefeitura, aguardar a vistoria e seguir as etapas indicadas para execução do serviço.
+**Documentos necessários:**
+
+- Formulário de solicitação
+- RG
+- CPF
+- Comprovante de residência
+- Comprovante de pagamento da taxa de serviço
+
+**Etapas:**
+
+1. Solicitar presencialmente no Protocolo da Prefeitura ou pelo aplicativo.
+2. Aguardar a vistoria para quantificação do entulho.
+3. Receber a guia de recolhimento.
+4. Realizar o pagamento da taxa.
+5. Aguardar a realização do serviço.
+
+**Prazo:**
+
+Até 7 dias.
+
+**Custo:**
+
+R$ 72,00.
+
+**Unidade responsável:**
+
+Secretaria Municipal de Serviços Públicos.
 
 ---
 
@@ -214,7 +239,7 @@ Por exemplo:
 
 > Qual é o salário do prefeito de Pinheiral?
 
-Como essa informação não está presente na Carta de Serviços utilizada como base de conhecimento, o agente informa que **não encontrou a informação na documentação consultada**.
+Como essa informação não está disponível na Carta de Serviços utilizada como base de conhecimento, o agente informa que **não encontrou a informação na documentação consultada**.
 
 Esse comportamento ajuda a reduzir alucinações e mantém o agente focado no domínio para o qual foi desenvolvido.
 
@@ -225,8 +250,8 @@ Esse comportamento ajuda a reduzir alucinações e mantém o agente focado no do
 A versão final da interface possui botões com exemplos de consultas:
 
 - 🌳 **Árvore com cupim**
+- 🐶 **Castração de animal**
 - 🗑️ **Retirada de entulho**
-- 🐶 **Castração de animais**
 - ✂️ **Poda de árvore**
 
 Ao clicar em uma das opções, a pergunta é enviada ao mesmo fluxo RAG utilizado pelas perguntas digitadas manualmente.
@@ -258,7 +283,7 @@ Também foram realizados testes manuais para verificar:
 - busca semântica;
 - integração com o Gemini;
 - funcionamento completo do fluxo RAG;
-- comportamento diante de perguntas fora da base;
+- tratamento de perguntas fora da base;
 - funcionamento da aplicação após o deploy.
 
 ---
@@ -347,21 +372,24 @@ Dessa forma, as credenciais utilizadas para acessar serviços externos permanece
 
 ## ☁️ Deploy na Oracle Cloud Infrastructure
 
-O **Cidadão.AI** foi implantado em uma instância da **Oracle Cloud Infrastructure (OCI)** utilizando **Oracle Linux 9**.
+O **Cidadão.AI** foi implantado em uma instância de computação da **Oracle Cloud Infrastructure (OCI)** utilizando **Oracle Linux 9**.
 
-A aplicação é executada em container utilizando **Podman**.
+A aplicação é executada em container utilizando **Podman** e disponibilizada pela porta **8501**.
 
-Para manter o container ativo de forma automática, foi configurado um serviço utilizando **systemd e Quadlet**.
+Para manter a aplicação em execução de forma independente da sessão SSH, o container foi configurado como um serviço utilizando **systemd e Quadlet**.
 
 ### Infraestrutura utilizada
 
-- Oracle Cloud Infrastructure
-- Oracle Linux 9
-- Podman
-- systemd / Quadlet
-- Streamlit
-- ChromaDB
-- Google Gemini
+- **Oracle Cloud Infrastructure (OCI)**
+- **Oracle Linux 9**
+- **VM.Standard.E2.1.Micro**
+- **1 OCPU**
+- **1 GB de memória**
+- **Podman**
+- **systemd / Quadlet**
+- **Streamlit**
+- **ChromaDB**
+- **Google Gemini**
 
 ### Fluxo do deploy
 
@@ -387,9 +415,9 @@ Internet
 
 ## 🌐 Aplicação publicada
 
-A aplicação foi disponibilizada publicamente por meio da infraestrutura da Oracle Cloud.
+A aplicação está disponível publicamente por meio da instância da Oracle Cloud:
 
-**Cidadão.AI:**
+**Cidadão.AI**
 
 http://163.176.12.14:8501
 
@@ -399,9 +427,15 @@ http://163.176.12.14:8501
 
 ## 📸 Evidências do funcionamento
 
-### Aplicação executada na Oracle Cloud
+### Deploy na Oracle Cloud Infrastructure
 
-A imagem abaixo apresenta a versão final da interface do **Cidadão.AI** em funcionamento após o deploy na OCI.
+A imagem abaixo mostra a instância **`cidadao-ai`** em execução (`Running`) na **Oracle Cloud Infrastructure**, com endereço IP público associado.
+
+![Deploy do Cidadão.AI na Oracle Cloud Infrastructure](docs/evidencias/cidadao-ai-deploy-oci.png)
+
+### Aplicação em funcionamento
+
+A imagem abaixo apresenta a versão final do **Cidadão.AI** acessível pela internet após o deploy na OCI.
 
 ![Cidadão.AI executado na Oracle Cloud](docs/evidencias/cidadao-ai-oci.png)
 
@@ -425,18 +459,19 @@ Uma demonstração da versão final do **Cidadão.AI**, incluindo a interface co
 
 Entre os principais recursos implementados estão:
 
-- respostas baseadas em documentação oficial;
+- respostas baseadas na documentação utilizada como fonte de conhecimento;
 - arquitetura RAG;
 - busca semântica utilizando embeddings;
 - banco vetorial com ChromaDB;
 - integração com Google Gemini;
-- interface conversacional com Streamlit;
+- interface conversacional desenvolvida em Streamlit;
 - sugestões de perguntas por meio de botões interativos;
 - histórico da conversa durante a sessão;
 - indicação da fonte principal utilizada na resposta;
 - tratamento de perguntas fora da base;
 - testes automatizados;
 - containerização com Podman;
+- serviço persistente com systemd/Quadlet;
 - deploy público na Oracle Cloud Infrastructure.
 
 ---
@@ -452,7 +487,7 @@ Algumas possíveis evoluções do projeto incluem:
 - expansão da base de conhecimento;
 - integração com novas fontes de dados municipais;
 - inclusão de novos serviços;
-- evolução contínua da experiência de uso da interface;
+- melhorias contínuas na experiência de uso da interface;
 - utilização de domínio próprio e HTTPS;
 - monitoramento da aplicação em produção.
 
@@ -487,8 +522,8 @@ Projeto desenvolvido como parte do **Challenge Alura — Agente Inteligente**, u
 
 ---
 
-## 📄 Licença e finalidade
+## 📄 Finalidade
 
-Projeto desenvolvido para fins educacionais e de demonstração de aplicação de técnicas de Inteligência Artificial.
+Projeto desenvolvido para fins educacionais e de demonstração da aplicação de técnicas de Inteligência Artificial.
 
-As informações utilizadas pelo agente têm como fonte a Carta de Serviços utilizada no desenvolvimento do projeto.
+As respostas do agente são geradas a partir das informações recuperadas da Carta de Serviços utilizada como base de conhecimento.

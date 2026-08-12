@@ -88,7 +88,7 @@ O projeto utiliza as seguintes tecnologias:
 - Oracle Cloud Infrastructure (OCI)
 - Oracle Linux 9
 
-> Pandas, PyPDF e Pytest são utilizados em etapas auxiliares de desenvolvimento, processamento e testes. O ambiente de produção utiliza um conjunto reduzido de dependências.
+> Pandas, PyPDF e Pytest foram utilizados em etapas auxiliares de desenvolvimento, processamento e testes. O ambiente de produção utiliza um conjunto reduzido de dependências.
 
 ---
 
@@ -108,6 +108,11 @@ cidadao-ai/
 ├── documents/
 │   ├── carta_de_servicos.pdf
 │   └── carta_servicos.json
+│
+├── docs/
+│   └── evidencias/
+│       ├── cidadao-ai-oci.png
+│       └── cidadao-ai-resposta-fora-base.png
 │
 ├── scripts/
 │   ├── analisar_json.py
@@ -159,27 +164,53 @@ Essas informações são utilizadas pelo mecanismo de busca semântica para recu
 
 ---
 
-## 🔎 Exemplo de utilização
+## 🔎 Exemplos de utilização
 
-### Pergunta relacionada à base
+### Exemplo 1 — Informação encontrada na base
 
-> Tem uma árvore com cupim no meu quintal, e agora?
+**Pergunta:**
 
-O agente identifica semanticamente o serviço relacionado a **Corte e Poda de Árvore** e utiliza as informações disponíveis na Carta de Serviços para apresentar orientações, documentos necessários, etapas, prazo, custo e canais de atendimento.
+> Tem uma árvore com cupim no meu quintal, o que devo fazer?
 
-### Pergunta cuja informação não está disponível
+O agente identifica semanticamente o serviço relacionado a **Corte e Poda de Árvore** e recupera as informações correspondentes na Carta de Serviços.
 
-> Qual é o nome do prefeito?
+**Exemplo de resposta gerada pelo agente:**
 
-Caso essa informação não esteja presente na Carta de Serviços utilizada como base de conhecimento, o agente informa que não encontrou a resposta.
+> Olá! Caso a árvore no seu quintal esteja oferecendo algum tipo de risco, como risco estrutural por conta dos cupins, você pode solicitar o serviço de **Corte e Poda de Árvore**.
+>
+> Entre as informações recuperadas estão a unidade responsável, os documentos necessários, as etapas para solicitação, prazo, custo e canais de atendimento.
 
-### Pergunta fora do domínio
+Esse exemplo demonstra a capacidade de recuperação semântica do sistema, pois o cidadão não precisa conhecer ou utilizar exatamente o nome oficial do serviço presente na Carta de Serviços.
+
+---
+
+### Exemplo 2 — Informação não disponível na base
+
+**Pergunta:**
+
+> Qual é o valor do salário do prefeito?
+
+**Resposta gerada pelo agente:**
+
+> Olá! Não encontrei a informação sobre o valor do salário do prefeito na Carta de Serviços da Prefeitura Municipal de Pinheiral.
+
+Nesse caso, o agente informa que a informação solicitada não está disponível na base utilizada pelo sistema.
+
+---
+
+### Exemplo 3 — Pergunta fora do domínio
+
+**Pergunta:**
 
 > Quantas Copas do Mundo o Brasil tem?
 
-O agente não utiliza conhecimento externo para responder e informa que essa informação não está disponível na Carta de Serviços.
+**Exemplo de resposta gerada pelo agente:**
 
-Esse comportamento ajuda a manter as respostas vinculadas à base oficial utilizada pelo sistema.
+> Olá! Não encontrei essa informação na Carta de Serviços da Prefeitura Municipal de Pinheiral.
+>
+> Como assistente virtual da Prefeitura, posso ajudar com informações sobre os serviços públicos municipais.
+
+Esse comportamento mantém o agente concentrado no domínio da Carta de Serviços e reduz a geração de respostas sem fundamento na base utilizada.
 
 ---
 
@@ -263,7 +294,7 @@ python scripts/criar_banco_vetorial.py
 streamlit run app/main.py
 ```
 
-Por padrão, o Streamlit poderá ser acessado em:
+Por padrão, a aplicação poderá ser acessada em:
 
 ```text
 http://localhost:8501
@@ -273,7 +304,7 @@ http://localhost:8501
 
 ## 🐳 Containerização
 
-O projeto possui um `Dockerfile` que permite executar a aplicação em um container compatível com tecnologias de containers OCI.
+O projeto possui um `Dockerfile` para permitir a execução da aplicação em container.
 
 No ambiente de produção foi utilizado **Podman**.
 
@@ -293,7 +324,7 @@ podman run -d \
   localhost/cidadao-ai:latest
 ```
 
-A porta utilizada pela aplicação é:
+A aplicação utiliza a porta:
 
 ```text
 8501/TCP
@@ -305,7 +336,7 @@ A porta utilizada pela aplicação é:
 
 O Cidadão.AI foi implantado na **Oracle Cloud Infrastructure (OCI)** utilizando uma máquina virtual com Oracle Linux 9.
 
-A aplicação é executada em container com Podman e disponibilizada publicamente através do Streamlit.
+A aplicação é executada em container utilizando Podman e disponibilizada através do Streamlit.
 
 ### Infraestrutura utilizada
 
@@ -345,7 +376,7 @@ Internet
 
 ## 🌐 Acesso público
 
-A aplicação foi disponibilizada publicamente através da instância da Oracle Cloud:
+A aplicação está disponibilizada através da instância utilizada na Oracle Cloud Infrastructure:
 
 ```text
 http://163.176.12.14:8501
@@ -355,9 +386,48 @@ http://163.176.12.14:8501
 
 ---
 
-## ✅ Validação do deploy
+## 📸 Evidências do deploy
 
-Após a implantação, a aplicação foi validada diretamente na máquina virtual.
+### Aplicação executando na Oracle Cloud
+
+A imagem abaixo mostra o Cidadão.AI sendo acessado através do endereço público da instância na Oracle Cloud Infrastructure.
+
+A aplicação recebe uma pergunta em linguagem natural e recupera informações relacionadas ao serviço **Corte e Poda de Árvore**.
+
+![Cidadão.AI executando na Oracle Cloud](docs/evidencias/cidadao-ai-oci.png)
+
+### Tratamento de informação não disponível
+
+O agente também foi testado com uma pergunta cuja resposta não está disponível na Carta de Serviços.
+
+![Cidadão.AI respondendo a informação não disponível na base](docs/evidencias/cidadao-ai-resposta-fora-base.png)
+
+Nesse caso, o agente informa que não encontrou a informação solicitada na base utilizada pelo projeto.
+
+---
+
+## 🎥 Demonstração em vídeo
+
+Foi gravada uma demonstração do **Cidadão.AI em funcionamento na Oracle Cloud Infrastructure**.
+
+No vídeo é possível acompanhar a utilização da aplicação através do endereço público, demonstrando o funcionamento do agente e sua interação com a Carta de Serviços.
+
+▶️ **[Assistir à demonstração do Cidadão.AI](https://youtube.com/shorts/mK_1_wtF1hU?feature=share)**
+
+A demonstração apresenta:
+
+- acesso à aplicação implantada na Oracle Cloud Infrastructure;
+- interface desenvolvida com Streamlit;
+- realização de perguntas em linguagem natural;
+- recuperação de informações da Carta de Serviços;
+- geração de respostas utilizando RAG;
+- comportamento do agente quando a informação solicitada não está disponível na base.
+
+---
+
+## ✅ Validação técnica do deploy
+
+Após a implantação, a aplicação foi validada diretamente na máquina virtual da Oracle Cloud.
 
 Foi realizado o teste:
 
@@ -378,37 +448,13 @@ Banco vetorial criado com sucesso.
 Documentos armazenados: 138
 ```
 
-O container em execução disponibiliza a aplicação através da porta:
+O container disponibiliza a aplicação através da porta:
 
 ```text
 0.0.0.0:8501
 ```
 
-Esses testes confirmam o funcionamento do servidor Streamlit, do container e da base vetorial na infraestrutura da OCI.
-
----
-
-## 💬 Exemplos de perguntas testadas
-
-Durante a validação do agente foram realizadas perguntas como:
-
-> Tem uma árvore com cupim no meu quintal, e agora?
-
-Nesse caso, o agente encontrou o serviço relacionado a corte e poda de árvores e apresentou as orientações existentes na Carta de Serviços.
-
-Outro teste realizado foi:
-
-> Construí uma casa nova e preciso ligar o esgoto.
-
-Como o procedimento específico para uma nova ligação de esgoto não estava disponível na base consultada, o agente informou que não encontrou esse serviço específico.
-
-Também foram realizadas perguntas fora do domínio:
-
-> Quantas Copas do Mundo o Brasil tem?
-
-Nesse caso, o agente informou que a resposta não estava disponível na Carta de Serviços.
-
-Esse comportamento demonstra que o sistema procura manter as respostas fundamentadas no contexto recuperado pela arquitetura RAG.
+Esses testes confirmam o funcionamento do servidor da aplicação, do container e da base vetorial na infraestrutura da OCI.
 
 ---
 
@@ -416,7 +462,7 @@ Esse comportamento demonstra que o sistema procura manter as respostas fundament
 
 Para que a aplicação permaneça disponível mesmo após o encerramento da sessão SSH, o container é gerenciado pelo **systemd utilizando Podman Quadlet**.
 
-Foi criado um serviço:
+Foi configurado o serviço:
 
 ```text
 cidadao-ai.service
@@ -424,7 +470,7 @@ cidadao-ai.service
 
 O serviço gerencia o container responsável pela aplicação.
 
-Também foi habilitado o recurso **linger** para o usuário responsável pelo container, permitindo que os serviços de usuário continuem sendo executados mesmo sem uma sessão SSH ativa.
+Também foi habilitado o recurso **linger** para o usuário responsável pelo container, permitindo que os serviços do usuário continuem sendo executados mesmo sem uma sessão SSH ativa.
 
 O status do serviço pode ser consultado com:
 
@@ -432,7 +478,7 @@ O status do serviço pode ser consultado com:
 systemctl --user status cidadao-ai.service
 ```
 
-E o container pode ser verificado com:
+O container pode ser verificado com:
 
 ```bash
 podman ps
@@ -442,36 +488,37 @@ podman ps
 
 ## 🔐 Segurança
 
-O projeto adota algumas medidas para evitar a exposição de informações sensíveis.
+O projeto adota medidas para evitar a exposição de informações sensíveis.
 
-A chave utilizada para acessar a API do Gemini é armazenada em:
+A chave utilizada para acessar a API do Gemini é armazenada no arquivo:
 
 ```text
 .env
 ```
 
-O arquivo está incluído no `.gitignore` e não deve ser versionado.
+O arquivo está incluído no `.gitignore` e não é versionado no repositório.
 
-No servidor, o arquivo também pode ter suas permissões limitadas:
+No servidor, suas permissões também foram limitadas:
 
 ```bash
 chmod 600 .env
 ```
 
-A chave de API não é armazenada no `Dockerfile` nem diretamente no código-fonte.
+A chave da API não é armazenada no `Dockerfile` nem diretamente no código-fonte.
 
 ---
 
 ## 🚧 Limitações atuais
 
-O projeto foi desenvolvido como uma solução de demonstração utilizando RAG e uma base específica de serviços municipais.
+O projeto foi desenvolvido como uma solução RAG utilizando uma base específica de serviços municipais.
 
 Entre as limitações atuais estão:
 
 - as respostas dependem das informações presentes na Carta de Serviços;
-- informações externas à base não são respondidas pelo agente;
+- informações externas à base não são utilizadas para responder às perguntas;
 - alterações na Carta de Serviços exigem atualização da base vetorial;
-- a disponibilidade pública depende da infraestrutura utilizada para hospedar a aplicação.
+- a disponibilidade pública depende da infraestrutura utilizada para hospedar a aplicação;
+- a recuperação vetorial pode encontrar documentos semanticamente próximos mesmo quando a informação solicitada não está presente neles.
 
 ---
 
@@ -481,12 +528,37 @@ Como possíveis evoluções do projeto:
 
 - atualização automática da Carta de Serviços;
 - persistência otimizada do banco vetorial entre reinicializações;
-- inclusão de fontes nas respostas;
+- melhoria da seleção e exibição das fontes recuperadas;
+- ocultação de fontes irrelevantes quando nenhuma resposta é encontrada;
 - melhoria da interface do Streamlit;
-- criação de domínio próprio com HTTPS;
+- utilização de domínio próprio e HTTPS;
 - monitoramento da aplicação;
 - ampliação da base de conhecimento;
 - integração com outros canais de atendimento ao cidadão.
+
+---
+
+## 📋 Entregáveis contemplados
+
+O projeto contempla os requisitos propostos no Challenge:
+
+- ✅ repositório público no GitHub;
+- ✅ histórico de commits;
+- ✅ estrutura organizada do projeto;
+- ✅ descrição geral do projeto;
+- ✅ documentação da arquitetura da solução;
+- ✅ tecnologias e ferramentas utilizadas;
+- ✅ instruções para execução;
+- ✅ exemplos de perguntas;
+- ✅ exemplos de respostas geradas pelo agente;
+- ✅ código para leitura e processamento da fonte de informação;
+- ✅ recuperação semântica utilizando banco vetorial;
+- ✅ agente inteligente funcional;
+- ✅ interface para interação com o cidadão;
+- ✅ deploy na Oracle Cloud Infrastructure;
+- ✅ link público da aplicação;
+- ✅ captura de tela da aplicação em funcionamento;
+- ✅ demonstração em vídeo do projeto.
 
 ---
 
@@ -494,4 +566,4 @@ Como possíveis evoluções do projeto:
 
 Projeto desenvolvido como parte de um desafio de Inteligência Artificial utilizando arquitetura **RAG (Retrieval-Augmented Generation)** para facilitar o acesso dos cidadãos às informações sobre serviços públicos municipais.
 
-O Cidadão.AI utiliza dados da Carta de Serviços da Prefeitura Municipal de Pinheiral - RJ como base de conhecimento.
+O **Cidadão.AI** utiliza dados da Carta de Serviços da Prefeitura Municipal de Pinheiral - RJ como base de conhecimento.
